@@ -3,7 +3,7 @@
 /// <summary>
 /// Кадр (сотрудник)
 /// </summary>
-internal class Employee
+internal class Employee : AbstractEmployee
 {
     public string Name { get; set; } = null!;
 
@@ -17,5 +17,10 @@ internal class Employee
     public void DoWork()
     {
         Console.WriteLine($"{EmployeeType} по имени {Name} делает свою работу");
+    }
+
+    public override string ToString()
+    {
+        return $"{EmployeeType} по имени {Name}";
     }
 }
