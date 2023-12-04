@@ -6,6 +6,11 @@ internal abstract class AbstractEmployee
     private static AbstractEmployee? _tail;
     private AbstractEmployee? _next;
 
+    public AbstractEmployee()
+    {
+        AddToLinkedList(this);
+    }
+
     public static void PrintLinkedList()
     {
         if (_head == null) 
@@ -25,7 +30,7 @@ internal abstract class AbstractEmployee
         }
     }
 
-    public static void AddToLinkedList(AbstractEmployee employee)
+    private static void AddToLinkedList(AbstractEmployee employee)
     {
         if (_tail == null)
         {
