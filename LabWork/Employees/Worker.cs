@@ -15,14 +15,11 @@ internal class Worker : Employee
     /// </summary>
     public string Workshop { get; set; } = null!;
 
+    public override string EmployeeType => "Рабочий";
+
     public Worker(string name, string specialty, string workshop) : base(name)
     {
         Specialty = specialty;
         Workshop = workshop;
-    }
-
-    public override string GetEmployeeType()
-    {
-        return "Рабочий";
     }
 }

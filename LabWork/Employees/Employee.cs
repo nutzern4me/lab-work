@@ -7,6 +7,8 @@ internal class Employee
 {
     public string Name { get; set; } = null!;
 
+    public virtual string EmployeeType => "Сотрудник";
+    
     public Employee(string name)
     {
         Name = name;
@@ -14,11 +16,6 @@ internal class Employee
 
     public void DoWork()
     {
-        Console.WriteLine($"{GetEmployeeType()} по имени {Name} делает свою работу");
-    }
-
-    public virtual string GetEmployeeType()
-    {
-        return "Сотрудник";
+        Console.WriteLine($"{EmployeeType} по имени {Name} делает свою работу");
     }
 }

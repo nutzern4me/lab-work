@@ -10,13 +10,10 @@ internal class Manager : Employee
     /// </summary>
     public string Position { get; set; } = null!;
 
+    public override string EmployeeType => "Администратор";
+
     public Manager(string name, string position) : base(name)
     {
         Position = position;
-    }
-
-    public override string GetEmployeeType()
-    {
-        return "Администратор";
     }
 }

@@ -15,14 +15,11 @@ internal class Engineer : Employee
     /// </summary>
     public string Department { get; set; } = null!;
 
+    public override string EmployeeType => "Инженер";
+
     public Engineer(string name, string qualification, string department) : base(name)
     {
         Qualification = qualification;
         Department = department;
-    }
-
-    public override string GetEmployeeType()
-    {
-        return "Инженер";
     }
 }
