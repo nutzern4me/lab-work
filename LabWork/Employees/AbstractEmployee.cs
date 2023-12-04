@@ -3,6 +3,7 @@
 internal abstract class AbstractEmployee
 {
     private static AbstractEmployee? _head;
+    private static AbstractEmployee? _tail;
     private AbstractEmployee? _next;
 
     public static void PrintLinkedList()
@@ -26,26 +27,15 @@ internal abstract class AbstractEmployee
 
     public static void AddToLinkedList(AbstractEmployee employee)
     {
-        AbstractEmployee? last = GetLastItem();
-
-        if (last == null)
-            _head = employee;
-        else
-            last._next = employee;
-    }
-
-    private static AbstractEmployee? GetLastItem()
-    {
-        if (_head == null)
-            return _head;
-
-        AbstractEmployee current = _head;
-
-        while (current._next != null)
+        if (_tail == null)
         {
-            current = current._next;
+            _head = employee;
+            _tail = _head;
         }
-
-        return current;
+        else
+        {
+            _tail._next = employee;
+            _tail = employee;
+        }            
     }
 }
