@@ -32,6 +32,9 @@ internal class Program
         myLinkedList.PrintAll();
         Console.WriteLine();
 
+        myLinkedList.PrintAllFromEnd();
+        Console.WriteLine();
+
         Console.WriteLine("Добавление 1, 2, 3");
         myLinkedList.Add(1);
         myLinkedList.Add(2);

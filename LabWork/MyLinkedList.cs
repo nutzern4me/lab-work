@@ -66,7 +66,7 @@ internal class MyLinkedList<T>
 
 
     /// <summary>
-    /// Вывод элементов списка от начала и от конца
+    /// Вывод элементов списка от начала и до конца
     /// </summary>
     public void PrintAll()
     {
@@ -84,6 +84,31 @@ internal class MyLinkedList<T>
         {
             Console.Write(current.Value + " ");
             current = current.Next;
+        }
+        while (current != null);
+
+        Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Вывод элементов списка от конца
+    /// </summary>
+    public void PrintAllFromEnd()
+    {
+        Console.Write("Вывод элементов списка от конца: ");
+
+        if (_tail == null)
+        {
+            Console.Write("Список пуст");
+            return;
+        }
+
+        Node<T>? current = _tail;
+
+        do
+        {
+            Console.Write(current.Value + " ");
+            current = current.Prev;
         }
         while (current != null);
 
