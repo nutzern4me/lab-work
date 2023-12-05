@@ -1,4 +1,6 @@
-﻿namespace LabWork.Employees;
+﻿using System.Collections;
+
+namespace LabWork.Employees;
 
 /// <summary>
 /// Рабочий
@@ -21,5 +23,19 @@ internal class Worker : Employee
     {
         Specialty = specialty;
         Workshop = workshop;
+    }
+
+    /// <summary>
+    /// Получение имен рабочих заданного цеха
+    /// </summary>
+    public static IEnumerable<string> GetNames(string workshop)
+    {
+        foreach (var item in GetEmployees())
+        {
+            if (item is Worker worker && worker.Workshop.Equals(workshop, StringComparison.OrdinalIgnoreCase))
+            {
+                yield return worker.Name;
+            }
+        }
     }
 }

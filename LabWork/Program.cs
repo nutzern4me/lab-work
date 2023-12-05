@@ -16,5 +16,18 @@ internal class Program
 
         AbstractEmployee.PrintLinkedList();
         Console.WriteLine();
+
+        _ = new Worker(name: "Денис Иванов", specialty: "Специальность1", workshop: "Цех1");
+
+        Console.Write("Имена рабочих цеха Цех1: ");
+        foreach (string name in Worker.GetNames("Цех1"))
+        {
+            Console.Write(name + "; ");
+        }
+        Console.WriteLine();
+
+        _ = new Engineer(name: "Новый инженер", qualification: "Квалификация1", department: "Подразделение1");
+
+        Console.WriteLine("Количество инженеров в подразделении Подразделение1: " + Engineer.GetCount("Подразделение1"));
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace LabWork.Employees;
+﻿using System.Collections;
+
+namespace LabWork.Employees;
 
 internal abstract class AbstractEmployee
 {
@@ -21,12 +23,9 @@ internal abstract class AbstractEmployee
 
         Console.Write("\nСписок сотрудников: ");
 
-        AbstractEmployee? current = _head;
-
-        while (current != null) 
+        foreach (var item in GetEmployees())
         {
-            Console.Write(current.ToString() + "; ");
-            current = current._next;
+            Console.Write(item.ToString() + "; ");
         }
     }
 
@@ -42,5 +41,16 @@ internal abstract class AbstractEmployee
             _tail._next = employee;
             _tail = employee;
         }            
+    }
+
+    public static IEnumerable<AbstractEmployee> GetEmployees()
+    {
+        var current = _head;
+
+        while (current != null)
+        {
+            yield return current;
+            current = current._next;
+        }
     }
 }
