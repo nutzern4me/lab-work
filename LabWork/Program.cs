@@ -4,51 +4,38 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        StartTest();
+        var set1 = new Cset<int>(1, 2, 3, 4, 4, 4, 5, 5, 5);
+        set1.PrintAll(nameof(set1));
         Console.WriteLine();
 
-        GC.Collect(); //Вызов сборки мусора для демонстрации работы реализованного деструктора
-        GC.WaitForPendingFinalizers(); //Ожидание окончания работы деструкторов
-    }
-
-    static void StartTest()
-    {
-        Console.WriteLine("Создание пустого списка");
-        var myList = new MyLinkedList<int>();
-        TestList(myList);
+        var set2 = new Cset<int>(3, 3, 3, 4, 5, 6, 7);
+        set2.PrintAll(nameof(set2));
         Console.WriteLine();
 
-        Console.WriteLine("Создание списка со значениями");
-        var myList2 = new MyLinkedList<int>(1, 2, 3, 4, 5);
-        TestList(myList2);
-
-        Console.WriteLine("\nСоздание списка путем копирования существующего");
-        var myList3 = new MyLinkedList<int>(myList2);
-        myList3.PrintAll();
-    }
-
-    static void TestList(MyLinkedList<int> myLinkedList)
-    {
-        myLinkedList.PrintAll();
+        var set3 = new Cset<int>(7, 6, 5, 4, 3);
+        set3.PrintAll(nameof(set3));
         Console.WriteLine();
 
-        myLinkedList.PrintAllFromEnd();
+        Console.WriteLine("Добавление элемента 8 в множество " + nameof(set1));
+        set1 += 8;
+        set1.PrintAll(nameof(set1));
         Console.WriteLine();
 
-        Console.WriteLine("Добавление 1, 2, 3");
-        myLinkedList.Add(1);
-        myLinkedList.Add(2);
-        myLinkedList.Add(3);
-        myLinkedList.PrintAll();
+        Console.WriteLine($"Объединение множеств {nameof(set1)} и {nameof(set2)}");
+        var unionSet = set1 + set2;
+        unionSet.PrintAll(nameof(unionSet));
         Console.WriteLine();
 
-        Console.WriteLine("Поиск элемента со значением 1");
-        var foundItem = myLinkedList.Find(1);
-        Console.WriteLine(foundItem?.Value);
+        Console.WriteLine($"Пересечение множеств {nameof(set1)} и {nameof(set2)}");
+        var intersectedSet = set1 * set2;
+        intersectedSet.PrintAll(nameof(intersectedSet));
         Console.WriteLine();
 
-        Console.WriteLine("Удаление найденного элемента");
-        myLinkedList.Remove(foundItem!);
-        myLinkedList.PrintAll();
+        Console.WriteLine($"Проверка множеств {nameof(set1)} и {nameof(set2)} на равенство: {set1 == set2}");
+        Console.WriteLine($"Проверка множеств {nameof(set2)} и {nameof(set3)} на равенство: {set2 == set3}");
+        
+        Console.WriteLine($"Мощность множества {nameof(set1)}: {(int)set1}");
+        Console.WriteLine($"Мощность множества {nameof(set2)}: {(int)set2}");
+        Console.WriteLine($"Мощность множества {nameof(set3)}: {(int)set3}");
     }
 }
