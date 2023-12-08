@@ -1,4 +1,10 @@
-﻿using System.Collections;
+﻿using LabWork.Employees;
+using LabWork.Exceptions;
+using System.Collections;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
+using System.Xml.Linq;
 
 namespace LabWork;
 
@@ -11,7 +17,7 @@ internal class Cset<T> : IEnumerable<T>
     /// <summary>
     /// Элементы множества
     /// </summary>
-    private readonly List<T> _items = new List<T>();
+    private List<T> _items = new List<T>();
 
     public int Count => _items.Count;
 
@@ -159,6 +165,80 @@ internal class Cset<T> : IEnumerable<T>
 
         Console.WriteLine();
     }
+
+
+    /// <summary>
+    /// Сохранение элементов множества в файл
+    /// </summary>
+    public async Task SaveToFileAsync(FileStream fileStream)
+    {
+        if (fileStream == null) 
+            throw new ArgumentNullException(nameof(fileStream));
+
+        var options = new JsonSerializerOptions
+        {
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+            WriteIndented = true
+        };
+
+        try
+        {
+            await JsonSerializer.SerializeAsync(fileStream, _items, options);
+        }
+        catch(Exception ex)
+        {
+            throw new CsetSaveException("Ошибка при сохранении множества", ex);
+        }
+    }
+
+    /// <summary>
+    /// Загрузка элементов множества из файла
+    /// </summary>
+    public async Task LoadFromFileAsync(FileStream fileStream)
+    {
+        if (fileStream == null)
+            throw new ArgumentNullException(nameof(fileStream));
+
+        List<T>? deserializedElements;
+        try
+        {
+            deserializedElements = await JsonSerializer.DeserializeAsync<List<T>>(fileStream);
+        }
+        catch (Exception ex)
+        {
+            throw new CsetLoadException("Ошибка при загрузке множества", ex);
+        }
+
+        if (deserializedElements == null)
+            throw new CsetLoadException("Ошибка при десериализации элементов множества");
+        else
+            _items = deserializedElements;
+    }
+
+    /// <summary>
+    /// Создание нового множества из файла
+    /// </summary>
+    public static async Task<Cset<T>> CreateFromFile(FileStream fileStream)
+    {
+        if (fileStream == null)
+            throw new ArgumentNullException(nameof(fileStream));
+
+        T[]? deserializedElements;
+
+        try
+        {
+            deserializedElements = await JsonSerializer.DeserializeAsync<T[]>(fileStream);
+        }
+        catch(Exception ex)
+        {
+            throw new CsetLoadException("Ошибка при загрузке множества", ex);
+        }
+
+        if (deserializedElements == null)
+            throw new CsetLoadException("Ошибка при десериализации элементов множества");
+
+        return new Cset<T>(deserializedElements);
+    } 
 
     #region реализация IEnumerable
     public IEnumerator<T> GetEnumerator()

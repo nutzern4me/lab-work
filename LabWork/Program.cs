@@ -1,95 +1,111 @@
 ﻿using LabWork.Employees;
+using LabWork.Exceptions;
 
 namespace LabWork;
 
 internal class Program
 {
-    static void Main(string[] args)
+    private const string SetFilesFolder = "setFiles";
+
+    static async Task Main(string[] args)
     {
-        var doubleSet1 = new Cset<double>(1, 2, 3, 4, 4, 4, 5, 5, 5);
-        var doubleSet2 = new Cset<double>(3, 3, 3, 4, 5, 6, 7);
-        TestSets(doubleSet1, doubleSet2, 8);
+        Directory.CreateDirectory(SetFilesFolder);
 
-        var charSet1 = new Cset<char>('a', 'b', 'c', 'd', 'e');
-        var charSet2 = new Cset<char>('d', 'e', 'f', 'g', 'h');
-        TestSets(charSet1, charSet2, 'z');
+        var intSet = new Cset<int>(1, 2, 3, 4, 5);
+        string intSetFilePath = GetFilePath(nameof(intSet));
+        Task saveIntSet = SaveToFileAsync(intSet, intSetFilePath);
 
-        var employeeSet1 = new Cset<Employee>(
+        var charSet = new Cset<char>('a', 'b', 'c', 'd', 'e');
+        string charSetFilePath = GetFilePath(nameof(charSet));
+        Task saveCharSet = SaveToFileAsync(charSet, charSetFilePath);
+
+        var empSet = new Cset<Employee>(
             new Employee("Иван Петров"),
             new Employee("Владимир Сергеев"),
             new Employee("Антон Никитин")
         );
-        var employeeSet2 = new Cset<Employee>(
-            new Employee("Дмитрий Лазарев"),
-            new Employee("Владимир Сергеев"),
-            new Employee("Николай Алексеев")
-        );
-        TestSets(employeeSet1, employeeSet2, new Employee("Денис Давыдов"));
+        string empSetFilePath = GetFilePath(nameof(empSet));
+        Task saveEmpSet = SaveToFileAsync(empSet, empSetFilePath);
 
-        
-        Console.WriteLine("\nУдаление каждого второго элемента в множестве " + nameof(doubleSet1));
-        DeleteEvenElemsTest(doubleSet1);
 
-        Console.WriteLine("\nУдаление каждого второго элемента в множестве " + nameof(charSet1));
-        DeleteEvenElemsTest(charSet1);
+        await saveIntSet;
+        var intSet2 = CreateFromFileAsync<int>(intSetFilePath);
 
-        Console.WriteLine("\nУдаление каждого второго элемента в множестве " + nameof(employeeSet1));
-        DeleteEvenElemsTest(employeeSet1);
+        await saveCharSet;
+        var charSet2 = CreateFromFileAsync<char>(charSetFilePath);
+
+        await saveEmpSet;
+        var empSet2 = CreateFromFileAsync<Employee>(empSetFilePath);
+
+
+        if ((await intSet2) is { } createdIntSet)
+            createdIntSet.PrintAll();
+
+        if ((await charSet2) is { } createdCharSet)
+            createdCharSet.PrintAll();
+
+        if ((await empSet2) is { } createdEmpSet)
+            createdEmpSet.PrintAll();
     }
 
-    private static void TestSets<T>(Cset<T> set1, Cset<T> set2, T itemToAdd)
+    private static string GetFilePath(string setName)
     {
-        set1.PrintAll(nameof(set1));
-        set2.PrintAll(nameof(set2));
-        Console.WriteLine();
-
-        Console.WriteLine($"Добавление элемента {itemToAdd} в множество");
-        set1 += itemToAdd;
-        set1.PrintAll(nameof(set1));
-        Console.WriteLine();
-
-        Console.WriteLine($"Объединение множеств {nameof(set1)} и {nameof(set2)}");
-        var unionSet = set1 + set2;
-        unionSet.PrintAll(nameof(unionSet));
-        Console.WriteLine();
-
-        Console.WriteLine($"Пересечение множеств {nameof(set1)} и {nameof(set2)}");
-        var intersectedSet = set1 * set2;
-        intersectedSet.PrintAll(nameof(intersectedSet));
-        Console.WriteLine();
-
-        Console.WriteLine($"Проверка множеств {nameof(set1)} и {nameof(set2)} на равенство: {set1 == set2}");
-
-        Console.WriteLine($"Мощность множества {nameof(set1)}: {(int)set1}");
-        Console.WriteLine($"Мощность множества {nameof(set2)}: {(int)set2}");
-        Console.WriteLine();
+        return Path.Combine(SetFilesFolder, setName + ".json");
     }
 
-    private static void DeleteEvenElemsTest<T>(Cset<T> set)
+    static async Task SaveToFileAsync<T>(Cset<T> set, string filename)
     {
-        set.PrintAll("до удаления");
-
-        DeleteSetEvenElements(ref set);
-        
-        set.PrintAll("после удаления");
-    }
-
-    /// <summary>
-    /// Удаление каждого второго элемента в множестве
-    /// </summary>
-    private static void DeleteSetEvenElements<T>(ref Cset<T> set)
-    {
-        var resultSet = new Cset<T>();
-
-        int i = 1;
-        foreach (var item in set)
+        try
         {
-            if (i % 2 != 0)
-                resultSet.Add(item);
-            
-            i++;
+            using FileStream fileStream = new FileStream(filename, FileMode.Create);
+            await set.SaveToFileAsync(fileStream);
         }
+        catch (Exception ex)
+        {
+            await HandleCsetFileException($"Ошибка при сохранении множества {typeof(T)} в файл {filename}", ex);
+        }
+    }
 
-        set = resultSet;
+    static async Task<Cset<T>?> CreateFromFileAsync<T>(string filename)
+    {
+        try
+        {
+            using FileStream fileStream = new FileStream(filename, FileMode.Open);
+            return await Cset<T>.CreateFromFile(fileStream);
+        }
+        catch (Exception ex)
+        {
+            await HandleCsetFileException($"Ошибка при загрузке множества {typeof(T)} из файла {filename}", ex);
+            return null;
+        }        
+    }
+
+    static async Task HandleCsetFileException(string mainMessage, Exception ex)
+    {
+        string exceptionMessage = ex switch
+        {
+            DirectoryNotFoundException => "Не найдена директория, указанная в пути",
+            FileNotFoundException => "Не найден файл",
+            PathTooLongException => "Путь к файлу слишком длинный",
+            CsetSaveException or CsetLoadException => ex.InnerException?.Message != null
+                ? $"{ex.Message} | {ex.InnerException.Message}"
+                : ex.Message,
+            _ => ex.Message
+        };
+
+        await Console.Out.WriteLineAsync($"{mainMessage}: {exceptionMessage}");
+    }
+
+    static async Task LoadFromFileAsync<T>(Cset<T> set, string filename)
+    {
+        try
+        {
+            using FileStream fileStream = new FileStream(filename, FileMode.Open);
+            await set.LoadFromFileAsync(fileStream);
+        }
+        catch (Exception ex)
+        {
+            await HandleCsetFileException($"Ошибка при загрузке множества {typeof(T)} из файла {filename}", ex);
+        }
     }
 }
