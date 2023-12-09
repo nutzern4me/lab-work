@@ -5,52 +5,65 @@ namespace LabWork;
 
 internal class Program
 {
-    private const string SetFilesFolder = "setFiles";
-
-    static async Task Main(string[] args)
+    static void Main(string[] args)
     {
-        Directory.CreateDirectory(SetFilesFolder);
+        Cset<double> doubleSet1 = [1, 2, 3, 4, 4, 4, 5, 5, 5];
+        Cset<double> doubleSet2 = [1, 2, 3, 3, 3, 4, 5, 8];
+        TestSets(doubleSet1, doubleSet2, 8);
 
-        var intSet = new Cset<int>(1, 2, 3, 4, 5);
-        string intSetFilePath = GetFilePath(nameof(intSet));
-        Task saveIntSet = SaveToFileAsync(intSet, intSetFilePath);
+        Cset<char> charSet1 = ['a', 'b', 'c', 'd', 'e'];
+        Cset<char> charSet2 = ['d', 'e', 'f', 'g', 'h'];
+        TestSets(charSet1, charSet2, 'z');
 
-        var charSet = new Cset<char>('a', 'b', 'c', 'd', 'e');
-        string charSetFilePath = GetFilePath(nameof(charSet));
-        Task saveCharSet = SaveToFileAsync(charSet, charSetFilePath);
+        Cset<Employee> employeeSet1 = [new("Иван Петров"), new("Владимир Сергеев"), new("Антон Никитин")];
+        Cset<Employee> employeeSet2 = [new("Дмитрий Лазарев"), new("Владимир Сергеев"), new("Николай Алексеев")];
+        TestSets(employeeSet1, employeeSet2, new Employee("Денис Давыдов"));
 
-        var empSet = new Cset<Employee>(
-            new Employee("Иван Петров"),
-            new Employee("Владимир Сергеев"),
-            new Employee("Антон Никитин")
-        );
-        string empSetFilePath = GetFilePath(nameof(empSet));
-        Task saveEmpSet = SaveToFileAsync(empSet, empSetFilePath);
+        Console.WriteLine("\nУдаление каждого второго элемента в множестве " + nameof(doubleSet1));
+        DeleteEvenElemsTest(doubleSet1);
 
+        Console.WriteLine("\nУдаление каждого второго элемента в множестве " + nameof(charSet1));
+        DeleteEvenElemsTest(charSet1);
 
-        await saveIntSet;
-        var intSet2 = CreateFromFileAsync<int>(intSetFilePath);
-
-        await saveCharSet;
-        var charSet2 = CreateFromFileAsync<char>(charSetFilePath);
-
-        await saveEmpSet;
-        var empSet2 = CreateFromFileAsync<Employee>(empSetFilePath);
-
-
-        if ((await intSet2) is { } createdIntSet)
-            createdIntSet.PrintAll();
-
-        if ((await charSet2) is { } createdCharSet)
-            createdCharSet.PrintAll();
-
-        if ((await empSet2) is { } createdEmpSet)
-            createdEmpSet.PrintAll();
+        Console.WriteLine("\nУдаление каждого второго элемента в множестве " + nameof(employeeSet1));
+        DeleteEvenElemsTest(employeeSet1);
     }
 
-    private static string GetFilePath(string setName)
+    private static void TestSets<T>(Cset<T> set1, Cset<T> set2, T itemToAdd)
     {
-        return Path.Combine(SetFilesFolder, setName + ".json");
+        set1.PrintAll(nameof(set1));
+        set2.PrintAll(nameof(set2));
+        Console.WriteLine();
+
+        Console.WriteLine($"Добавление элемента {itemToAdd} в множество");
+        set1 += itemToAdd;
+        set1.PrintAll(nameof(set1));
+        Console.WriteLine();
+
+        Console.WriteLine($"Объединение множеств {nameof(set1)} и {nameof(set2)}");
+        var unionSet = set1 + set2;
+        unionSet.PrintAll(nameof(unionSet));
+        Console.WriteLine();
+
+        Console.WriteLine($"Пересечение множеств {nameof(set1)} и {nameof(set2)}");
+        var intersectedSet = set1 * set2;
+        intersectedSet.PrintAll(nameof(intersectedSet));
+        Console.WriteLine();
+
+        Console.WriteLine($"Проверка множеств {nameof(set1)} и {nameof(set2)} на равенство: {set1 == set2}");
+
+        Console.WriteLine($"Мощность множества {nameof(set1)}: {(int)set1}");
+        Console.WriteLine($"Мощность множества {nameof(set2)}: {(int)set2}");
+        Console.WriteLine();
+    }
+
+    private static void DeleteEvenElemsTest<T>(Cset<T> set)
+    {
+        set.PrintAll("до удаления");
+
+        Cset<T>.DeleteSetEvenElements(ref set);
+
+        set.PrintAll("после удаления");
     }
 
     static async Task SaveToFileAsync<T>(Cset<T> set, string filename)

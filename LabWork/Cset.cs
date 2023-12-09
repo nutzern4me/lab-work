@@ -1,5 +1,6 @@
 ﻿using LabWork.Employees;
 using LabWork.Exceptions;
+using System;
 using System.Collections;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -238,7 +239,28 @@ internal class Cset<T> : IEnumerable<T>
             throw new CsetLoadException("Ошибка при десериализации элементов множества");
 
         return new Cset<T>(deserializedElements);
-    } 
+    }
+
+    // индексатор
+    public T this[int index]
+    {
+        get => _items[index];
+        set => _items[index] = value;
+    }
+
+    /// <summary>
+    /// Удаление каждого второго элемента в множестве
+    /// </summary>
+    public static void DeleteSetEvenElements(ref Cset<T> set)
+    {
+        var resultSet = new Cset<T>();
+
+        for (int i = 0; i < set.Count; i++)
+            if ((i + 1) % 2 != 0)
+                resultSet.Add(set[i]);
+
+        set = resultSet;
+    }
 
     #region реализация IEnumerable
     public IEnumerator<T> GetEnumerator()
