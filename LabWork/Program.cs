@@ -6,28 +6,46 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        var employee1 = new Employee(name: "Пётр Иванов");
+        List<Employee> list = new();
 
-        var worker1 = new Worker(name: "Иван Алексеев", specialty: "Специальность1", workshop: "Цех1");
+        DeputyGeneralDirector depGenDir = new("Алексей Алексеевич");
 
-        var engineer1 = new Engineer(name: "Алексей Васильев", qualification: "Квалификация1", department: "Подразделение1");
-
-        var manager1 = new Manager(name: "Василий Петров", position: "Директор");
-
-        AbstractEmployee.PrintLinkedList();
-        Console.WriteLine();
-
-        _ = new Worker(name: "Денис Иванов", specialty: "Специальность1", workshop: "Цех1");
-
-        Console.Write("Имена рабочих цеха Цех1: ");
-        foreach (string name in Worker.GetNames("Цех1"))
+        try
         {
-            Console.Write(name + "; ");
+            Engineer engineer = depGenDir.HireNewEmployee<Engineer>("Михаил Зубенко");
+            list.Add(engineer);
+
+            DeputyGeneralDirector depGenDir2 = depGenDir.HireNewEmployee<DeputyGeneralDirector>("новый зам. ген. директора");
+            list.Add(depGenDir2);
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+        if (depGenDir.TryHireNewEmployee(out Worker worker, "Денис Петров"))
+        {
+            list.Add(worker);
+        }
+
+        if (depGenDir.TryHireNewEmployee(out Employee emp, "абстрактный сотрудник"))
+        {
+            list.Add(emp);
+        }
+
+        var manager = new Manager(name: "Василий Петров", position: "Директор отдела продаж");
+        list.Add(manager);
+
+
+        Console.WriteLine("Сотрудники, добавленные в List:");
+        foreach (var employee in list) 
+        {
+            Console.WriteLine(employee);
+        }
+
+        
+        Employee.PrintLinkedList();
         Console.WriteLine();
-
-        _ = new Engineer(name: "Новый инженер", qualification: "Квалификация1", department: "Подразделение1");
-
-        Console.WriteLine("Количество инженеров в подразделении Подразделение1: " + Engineer.GetCount("Подразделение1"));
+        Console.WriteLine("Всего сотрудников: " + Employee.GetEmployeesCount());
     }
 }

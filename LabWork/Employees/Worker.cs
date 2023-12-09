@@ -19,7 +19,8 @@ internal class Worker : Employee
 
     public override string EmployeeType => "Рабочий";
 
-    public Worker(string name, string specialty, string workshop) : base(name)
+    public Worker(string name, string specialty = "Специальность по умолчанию", string workshop = "Цех по умолчанию") 
+        : base(name)
     {
         Specialty = specialty;
         Workshop = workshop;

@@ -12,7 +12,7 @@ internal class Manager : Employee
 
     public override string EmployeeType => "Администратор";
 
-    public Manager(string name, string position) : base(name)
+    public Manager(string name, string position = "Должность по умолчанию") : base(name)
     {
         Position = position;
     }

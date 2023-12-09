@@ -17,7 +17,8 @@ internal class Engineer : Employee
 
     public override string EmployeeType => "Инженер";
 
-    public Engineer(string name, string qualification, string department) : base(name)
+    public Engineer(string name, string qualification = "Квалификация по умолчанию", string department = "Подразделение по умолчанию")
+        : base(name)
     {
         Qualification = qualification;
         Department = department;
