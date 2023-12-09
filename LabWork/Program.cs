@@ -4,51 +4,99 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        StartTest();
-        Console.WriteLine();
+        TestLongList();
 
-        GC.Collect(); //Вызов сборки мусора для демонстрации работы реализованного деструктора
-        GC.WaitForPendingFinalizers(); //Ожидание окончания работы деструкторов
+        TestMyClassList();
     }
 
-    static void StartTest()
+    static void TestMyClassList()
     {
-        Console.WriteLine("Создание пустого списка");
-        var myList = new MyLinkedList<int>();
-        TestList(myList);
-        Console.WriteLine();
+        List<MyLinkedList<char>> list = [
+            new('a', 'b', 'c'),
+            new('d', 'e', 'f'),
+            new('g', 'h', 'i'),
+            new('j', 'k', 'l'),
+            new('m', 'n', 'o'),
+            new('p', 'q', 'r'),
+            new('s', 't', 'u'),
+        ];
+        PrintList(list);
 
-        Console.WriteLine("Создание списка со значениями");
-        var myList2 = new MyLinkedList<int>(1, 2, 3, 4, 5);
-        TestList(myList2);
+        list.RemoveAt(1);
+        list[2].Add('z');
+        PrintList(list);
 
-        Console.WriteLine("\nСоздание списка путем копирования существующего");
-        var myList3 = new MyLinkedList<int>(myList2);
-        myList3.PrintAll();
+        int n = list.Count / 2;
+        list.RemoveRange(n, n);
+        PrintList(list);
+
+        list.Sort((a, b) => b.CompareTo(a));
+        PrintList(list);
+
+
+        //находим в списке элемент (двусвязный список), который соответствует заданному условию (количество элементов равно 3)
+        Predicate<MyLinkedList<char>> predicate = x => x.Count() == 3;
+        MyLinkedList<char>? foundLinkedList = list.Find(predicate);
+        
+        if (foundLinkedList != null)
+            foundLinkedList.PrintAll();
+        else
+            Console.WriteLine("Элемент не найден");
+
+        //находим все элементы, соответствующие этому условию 
+        var allFoundLists = list.FindAll(predicate);
+        //выводим количество найденных и их содержимое 
+        Console.WriteLine(allFoundLists.Count());
+        PrintList(allFoundLists);
     }
 
-    static void TestList(MyLinkedList<int> myLinkedList)
+    static void PrintList<T>(List<MyLinkedList<T>> list)
     {
-        myLinkedList.PrintAll();
-        Console.WriteLine();
+        Console.WriteLine("\n========== List<MyLinkedList<T>> ==========");
 
-        myLinkedList.PrintAllFromEnd();
-        Console.WriteLine();
+        foreach (var item in list)
+        {
+            item.PrintAll();
+        }
 
-        Console.WriteLine("Добавление 1, 2, 3");
-        myLinkedList.Add(1);
-        myLinkedList.Add(2);
-        myLinkedList.Add(3);
-        myLinkedList.PrintAll();
-        Console.WriteLine();
-
-        Console.WriteLine("Поиск элемента со значением 1");
-        var foundItem = myLinkedList.Find(1);
-        Console.WriteLine(foundItem?.Value);
-        Console.WriteLine();
-
-        Console.WriteLine("Удаление найденного элемента");
-        myLinkedList.Remove(foundItem!);
-        myLinkedList.PrintAll();
+        Console.WriteLine("===========================================");
     }
+
+    static void TestLongList()
+    {
+        List<long> list = [1L, 1L, 4L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L];
+        PrintList(list);
+
+        list.Remove(11);
+        list.RemoveAt(1);
+        list[1] /= 2;
+        PrintList(list);
+
+        int n = list.Count / 2;
+        list.RemoveRange(n, n);
+        PrintList(list);
+
+        list.Sort((a, b) => b.CompareTo(a));
+        PrintList(list);
+    }
+
+    static void PrintList<T>(List<T> list)
+    {
+        Console.Write("\nList: ");
+        
+        foreach (var item in list.SkipLast(1)) 
+        {
+            Console.Write(item + ", ");
+        }
+
+        Console.WriteLine(list.LastOrDefault());
+    }
+
+
+    //static List<long> CreateAndFillList()
+    //{
+    //    return new List<long> { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L };
+    //}
+
+
 }

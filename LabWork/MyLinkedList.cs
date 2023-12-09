@@ -1,12 +1,32 @@
-﻿namespace LabWork;
+﻿using System.Collections;
+using System.Collections.Generic;
 
-internal class MyLinkedList<T>
+namespace LabWork;
+
+internal class MyLinkedList<T> : IComparable, IEnumerable<MyLinkedList<T>.Node<T>>
 {
-    internal class Node<NodeType> where NodeType : T
+    internal class Node<NodeType> : IComparable 
+        where NodeType : T
     {
         public NodeType? Value { get; set; }
         public Node<NodeType>? Prev { get; set; }
         public Node<NodeType>? Next { get; set; }
+
+        public int CompareTo(object? obj)
+        {
+            if (obj == null) return 1;
+            if (Value == null) return -1;
+
+            if (obj is MyLinkedList<T>.Node<NodeType> otherNode)
+            {
+                if (Value is IComparable comparableVal)
+                    return comparableVal.CompareTo(otherNode.Value);
+
+                return 0;
+            }
+
+            throw new ArgumentException("Объект для сравнения не является " + nameof(MyLinkedList<T>.Node<NodeType>));
+        }
     }
 
     private Node<T>? _head;
@@ -28,7 +48,7 @@ internal class MyLinkedList<T>
     /// <param name="values">Элементы из которых будет создан список</param>
     public MyLinkedList(params T[] values)
     {
-        Console.WriteLine("Вызван конструктор с параметрами");
+        //Console.WriteLine("Вызван конструктор с параметрами");
 
         _head = new Node<T>();
         _head.Value = values[0];
@@ -63,7 +83,6 @@ internal class MyLinkedList<T>
             nodeToCopy = nodeToCopy.Next;
         }
     }
-
 
     /// <summary>
     /// Вывод элементов списка от начала и до конца
@@ -193,6 +212,27 @@ internal class MyLinkedList<T>
         while (current != null);
 
         return null;
+    }
+
+    public int CompareTo(object? obj)
+    {
+        if (obj == null) return 1;
+        if (this.Head == null) return -1;
+
+        if (obj is MyLinkedList<T> list)
+            return this.Head.CompareTo(list.Head);
+
+        throw new ArgumentException("Объект для сравнения не является " + nameof(MyLinkedList<T>));
+    }
+
+    public IEnumerator<MyLinkedList<T>.Node<T>> GetEnumerator()
+    {
+        return new MyLinkedListEnumerator<T>(_head);
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 
     /// <summary>
